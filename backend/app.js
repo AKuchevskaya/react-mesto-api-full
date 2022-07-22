@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const { Joi, celebrate, errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const cors = require('./middlewares/cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger'); 
 const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards');
@@ -21,6 +22,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(cors); // подключаем cors
 
 app.use(requestLogger); // подключаем логгер запросов
 
@@ -47,7 +50,7 @@ app.use(auth);
 app.use('/users', routerUser);
 app.use('/cards', routerCard);
 
-app.use(logger);
+app.use(errorLogger);
 
 app.use((req, res, next) => {
   next(new NotFoundError('Страница не существует'));
