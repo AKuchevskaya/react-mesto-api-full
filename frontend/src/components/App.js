@@ -41,9 +41,9 @@ function App() {
   const [buttonState, setButtonState] = useState(true);
 
   function tokenCheck() {
-    if (localStorage.getItem("token")) {
-      let token = localStorage.getItem("token");
-      Auth.getContent(token)
+    if (localStorage.getItem("email")) {
+      //let token = localStorage.getItem("token");
+      Auth.getContent()
         .then((res) => {
           const { _id, email } = res.data;
           setLoggedIn(true);
@@ -201,8 +201,9 @@ function App() {
   function handleLogin({ email, password }) {
     return Auth.authorize(email, password)
       .then((data) => {
-        if (data.token) {
-          localStorage.setItem("token", data.token);
+        if (data.email) {
+          setLoggedIn(true);
+          //localStorage.setItem("token", data.token);
           tokenCheck();
         }
       })
@@ -217,7 +218,8 @@ function App() {
   }
 
   function signOut() {
-    localStorage.removeItem("token");
+    // localStorage.removeItem("token");
+    localStorage.removeItem("email");
     setLoggedIn(false);
     setUserData({ _id: "", email: "" });
     history.push("/signin");

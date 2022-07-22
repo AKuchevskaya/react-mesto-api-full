@@ -11,6 +11,7 @@ export const register = (email, password) => {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
+    credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
     body: JSON.stringify({
       email,
       password,
@@ -25,6 +26,7 @@ export const authorize = (email, password) => {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
+    credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
     body: JSON.stringify({
       email,
       password,
@@ -38,7 +40,8 @@ export const getContent = (token) => {
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      // Authorization: `Bearer ${token}`,
     },
+    credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
   }).then(checkResponse);
 };

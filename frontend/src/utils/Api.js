@@ -11,6 +11,7 @@ class Api {
   getProfile() {
     return fetch(`${this._baseUrl}/users/me`, {
       headers: this._headers,
+      credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
     }).then((res) => this._checkResponse(res));
   }
 
@@ -18,6 +19,7 @@ class Api {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: "PATCH",
       headers: this._headers,
+      credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
       body: JSON.stringify({
         avatar,
       }),
@@ -28,6 +30,7 @@ class Api {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "PATCH",
       headers: this._headers,
+      credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
       body: JSON.stringify({
         name,
         about,
@@ -45,6 +48,7 @@ class Api {
     return fetch(`${this._baseUrl}/cards`, {
       method: "POST",
       headers: this._headers,
+      credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
       body: JSON.stringify({
         name,
         link,
@@ -56,6 +60,7 @@ class Api {
     return fetch(`${this._baseUrl}/cards/${id}`, {
       method: "DELETE",
       headers: this._headers,
+      credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
     }).then((res) => this._checkResponse(res));
   }
 
@@ -63,6 +68,7 @@ class Api {
     return fetch(`${this._baseUrl}/cards/${id}/likes`, {
       method: "DELETE",
       headers: this._headers,
+      credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
     }).then((res) => this._checkResponse(res));
   }
 
@@ -70,6 +76,7 @@ class Api {
     return fetch(`${this._baseUrl}/cards/${id}/likes`, {
       method: "PUT",
       headers: this._headers,
+      credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
     }).then((res) => this._checkResponse(res));
   }
 
@@ -77,14 +84,16 @@ class Api {
     return fetch(`${this._baseUrl}/cards/${id}/likes`, {
       method: isLiked ? "PUT" : "DELETE",
       headers: this._headers,
+      credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
     }).then((res) => this._checkResponse(res));
   }
 }
 
 const api = new Api({
-  baseUrl: "https://mesto.nomoreparties.co/v1/cohort-39",
+  baseUrl: "https://api.mesto.kuchevskaya.nomoredomains.xyz",
+  //baseUrl: "https://mesto.nomoreparties.co/v1/cohort-39",
   headers: {
-    authorization: "c7995123-32f8-4a6a-9c95-5dfea08bd5f1",
+    //authorization: "c7995123-32f8-4a6a-9c95-5dfea08bd5f1",
     "Content-Type": "application/json",
   },
 });
