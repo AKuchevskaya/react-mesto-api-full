@@ -1,0 +1,38 @@
+{
+  "name": "express-mesto-gha",
+  "version": "1.0.0",
+  "description": "https://akuchevskaya.github.io/express-mesto-gha/ Проект Mesto фронтенд + бэкенд",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "lint": "npx eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AKuchevskaya/express-mesto-gha.git"
+  },
+  "keywords": [],
+  "author": "AKuchevskaya",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AKuchevskaya/express-mesto-gha/issues"
+  },
+  "homepage": "https://github.com/AKuchevskaya/express-mesto-gha#readme",
+  "devDependencies": {
+    "eslint": "^8.17.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "nodemon": "^2.0.16"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.0",
+    "celebrate": "^15.0.1",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.18.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.3.8",
+    "validator": "^13.7.0"
+  }
+}
