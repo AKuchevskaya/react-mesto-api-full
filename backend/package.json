@@ -1,7 +1,7 @@
 {
-  "name": "express-mesto-gha",
+  "name": "react-mesto-api-full",
   "version": "1.0.0",
-  "description": "https://akuchevskaya.github.io/express-mesto-gha/ Проект Mesto фронтенд + бэкенд",
+  "description": "Проект Mesto фронтенд + бэкенд",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
