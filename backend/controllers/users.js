@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
+const { NODE_ENV, JWT_SECRET } = process.env;
 const {
   SUCCESSFUL_STATUS_CODE,
 } = require('../constants/errors');
@@ -19,7 +20,8 @@ module.exports.login = (req, res, next) => {
       // создадим токен
       const token = jwt.sign(
         { _id: user._id },
-        'very-secret-key',
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        // 'very-secret-key',
         { expiresIn: '7d' }, // токен будет просрочен через 7 дней после создания
       );
 
@@ -29,7 +31,8 @@ module.exports.login = (req, res, next) => {
       return res.cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
-        sameSite: true,
+        // secure: true,
+        // sameSite: true,
       }).send({ token });
     })
     .catch(() => {
