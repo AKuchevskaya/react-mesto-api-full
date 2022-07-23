@@ -45,7 +45,7 @@ function App() {
       let token = localStorage.getItem("jwt");
       Auth.getContent(token)
         .then((res) => {
-          const { _id, email } = res.data;
+          const { _id, email } = res.email;
           setLoggedIn(true);
           setUserData({ ...userData, _id, email });
         })
@@ -178,7 +178,7 @@ function App() {
   function handleRegister({ email, password }) {
     return Auth.register(email, password)
       .then((res) => {
-        const { email } = res.data;
+        const { email } = res.email;
         setUserData({ ...userData, email });
         setTooltipOpen(true);
         setTooltip({
