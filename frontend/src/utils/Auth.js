@@ -4,12 +4,13 @@ const checkResponse = (res) => {
   return res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`);
 };
 
-export const register = (email, password) => {
+export const register = (email, password, token) => {
   return fetch(`${BASE_URL}/signup`, {
     method: "POST",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
     },
     credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
     body: JSON.stringify({
@@ -19,12 +20,13 @@ export const register = (email, password) => {
   }).then(checkResponse);
 };
 
-export const authorize = (email, password) => {
+export const authorize = (email, password, token) => {
   return fetch(`${BASE_URL}/signin`, {
     method: "POST",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
     },
     credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
     body: JSON.stringify({
@@ -40,7 +42,7 @@ export const getContent = (token) => {
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      // Authorization: `Bearer ${token}`,
+      "Authorization": `Bearer ${token}`,
     },
     credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
   }).then(checkResponse);

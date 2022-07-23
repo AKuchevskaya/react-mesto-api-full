@@ -3,7 +3,7 @@ const allowedCors = [
     'http://mesto.kuchevskaya.nomoredomains.xyz',
     'http://api.mesto.kuchevskaya.nomoredomains.xyz',
     'https://api.mesto.kuchevskaya.nomoredomains.xyz',
-    'localhost:3000',
+    //'localhost:3000',
   ];
   
   // eslint-disable-next-line consistent-return

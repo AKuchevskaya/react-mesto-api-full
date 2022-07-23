@@ -8,17 +8,23 @@ class Api {
     return res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`);
   }
 
-  getProfile() {
+  getProfile(token) {
     return fetch(`${this._baseUrl}/users/me`, {
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
       credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
     }).then((res) => this._checkResponse(res));
   }
 
-  editAvatar(avatar) {
+  editAvatar(avatar, token) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: "PATCH",
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
       credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
       body: JSON.stringify({
         avatar,
@@ -26,10 +32,13 @@ class Api {
     }).then((res) => this._checkResponse(res));
   }
 
-  editProfile(name, about) {
+  editProfile(name, about, token) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "PATCH",
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
       credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
       body: JSON.stringify({
         name,
@@ -38,16 +47,23 @@ class Api {
     }).then((res) => this._checkResponse(res));
   }
 
-  getInitialCards() {
+  getInitialCards(token) {
     return fetch(`${this._baseUrl}/cards`, {
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
     }).then((res) => this._checkResponse(res));
   }
 
-  addCard(name, link) {
+  addCard(name, link, token) {
     return fetch(`${this._baseUrl}/cards`, {
       method: "POST",
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
       credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
       body: JSON.stringify({
         name,
@@ -56,35 +72,48 @@ class Api {
     }).then((res) => this._checkResponse(res));
   }
 
-  deleteCard(id) {
+  deleteCard(id, token) {
     return fetch(`${this._baseUrl}/cards/${id}`, {
       method: "DELETE",
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
       credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
     }).then((res) => this._checkResponse(res));
   }
 
-  deleteLike(id) {
+  deleteLike(id, token) {
     return fetch(`${this._baseUrl}/cards/${id}/likes`, {
       method: "DELETE",
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
       credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
     }).then((res) => this._checkResponse(res));
   }
 
-  addLike(id) {
+  addLike(id, token) {
     return fetch(`${this._baseUrl}/cards/${id}/likes`, {
       method: "PUT",
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
       credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
     }).then((res) => this._checkResponse(res));
   }
 
-  changeLikeCardStatus(id, isLiked) {
+  changeLikeCardStatus(id, isLiked, token) {
     return fetch(`${this._baseUrl}/cards/${id}/likes`, {
       method: isLiked ? "PUT" : "DELETE",
-      headers: this._headers,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
       credentials: 'include', // т.к. разрешила в браузере запросы c Allow-Credentials
+
     }).then((res) => this._checkResponse(res));
   }
 }
@@ -92,10 +121,10 @@ class Api {
 const api = new Api({
   baseUrl: "https://api.mesto.kuchevskaya.nomoredomains.xyz",
   //baseUrl: "https://mesto.nomoreparties.co/v1/cohort-39",
-  headers: {
-    //authorization: "c7995123-32f8-4a6a-9c95-5dfea08bd5f1",
-    "Content-Type": "application/json",
-  },
+  // headers: {
+  //   "Content-Type": "application/json",
+  //   "Authorization": `Bearer ${token}`,
+  // },
 });
 
 export default api;

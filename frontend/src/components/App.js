@@ -27,7 +27,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState({});
-  const [removedCard, setRemovedCard] = useState(null);
+  const [removedCardId, setRemovedCardId] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [userData, setUserData] = useState();
   const history = useHistory();
@@ -41,9 +41,9 @@ function App() {
   const [buttonState, setButtonState] = useState(true);
 
   function tokenCheck() {
-    if (localStorage.getItem("email")) {
-      //let token = localStorage.getItem("token");
-      Auth.getContent()
+    if (localStorage.getItem("jwt")) {
+      let jwt = localStorage.getItem("jwt");
+      Auth.getContent(jwt)
         .then((res) => {
           const { _id, email } = res.data;
           setLoggedIn(true);
@@ -64,12 +64,14 @@ function App() {
     }
   }, [loggedIn]);
 
+  const token = localStorage.getItem('jwt');
+
   useEffect(() => {
     if (loggedIn) {
       Promise.all([
         //в Promise.all передаем массив промисов которые нужно выполнить
-        api.getInitialCards(),
-        api.getProfile(),
+        api.getInitialCards(token),
+        api.getProfile(token),
       ])
         .then(([cards, currentUser]) => {
           setCards(cards);
@@ -83,7 +85,8 @@ function App() {
 
   function handleCardLike(card) {
     // Снова проверяем, есть ли уже лайк на этой карточке
-    const isLiked = card.likes.some((user) => user._id === currentUser._id);
+    // const isLiked = card.likes.some((user) => user._id === currentUser._id);
+    const isLiked = card.likes.some((user) => user === currentUser._id);
 
     // Отправляем запрос в API и получаем обновлённые данные карточки
     api
@@ -100,10 +103,10 @@ function App() {
 
   function handleCardDelete(card) {
     api
-      .deleteCard(removedCard._id)
+      .deleteCard(removedCardId, token)
       .then(() => {
         setCards((state) =>
-          state.filter((item) => item._id !== removedCard._id)
+          state.filter((item) => item._id !== removedCardId)
         );
         closeAllPopups();
       })
@@ -123,7 +126,7 @@ function App() {
   }
   function handleButtonDeleteClick(card) {
     setQwestionPopupOpen(true);
-    setRemovedCard(card);
+    setRemovedCardId(card);
   }
 
   function handleCardClick(card) {
@@ -135,7 +138,7 @@ function App() {
   }
   function handleUpdateAvatar({ avatar }) {
     api
-      .editAvatar(avatar)
+      .editAvatar(avatar, token)
       .then((res) => {
         setCurrentUser(res);
         closeAllPopups();
@@ -146,7 +149,7 @@ function App() {
   }
   function handleUpdateUser({ name, about }) {
     api
-      .editProfile(name, about)
+      .editProfile(name, about, token)
       .then((res) => {
         setCurrentUser(res);
         closeAllPopups();
@@ -158,7 +161,7 @@ function App() {
 
   function handleAddPlaceSubmit({ name, link }) {
     api
-      .addCard(name, link)
+      .addCard(name, link, token)
       .then((newCard) => {
         setCards([newCard, ...cards]);
         closeAllPopups();
@@ -178,7 +181,8 @@ function App() {
   function handleRegister({ email, password }) {
     return Auth.register(email, password)
       .then((res) => {
-        const { email } = res.data;
+        console.log(res);
+        const { email } = res;
         setUserData({ ...userData, email });
         setTooltipOpen(true);
         setTooltip({
@@ -201,9 +205,9 @@ function App() {
   function handleLogin({ email, password }) {
     return Auth.authorize(email, password)
       .then((data) => {
-        if (data.email) {
+        if (data.token) {
           setLoggedIn(true);
-          //localStorage.setItem("token", data.token);
+          localStorage.setItem("jwt", data.token);
           tokenCheck();
         }
       })
@@ -218,8 +222,7 @@ function App() {
   }
 
   function signOut() {
-    // localStorage.removeItem("token");
-    localStorage.removeItem("email");
+    localStorage.removeItem("jwt");
     setLoggedIn(false);
     setUserData({ _id: "", email: "" });
     history.push("/signin");
