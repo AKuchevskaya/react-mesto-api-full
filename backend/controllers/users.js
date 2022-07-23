@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
-const DEV_SECRET = 'dev-secret';
+
 const {
   SUCCESSFUL_STATUS_CODE,
 } = require('../constants/errors');
@@ -21,7 +21,7 @@ module.exports.login = (req, res, next) => {
       // создадим токен
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : DEV_SECRET,
+        NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
         // 'very-secret-key',
         { expiresIn: '7d' }, // токен будет просрочен через 7 дней после создания
       );
@@ -33,7 +33,7 @@ module.exports.login = (req, res, next) => {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
         secure: true,
-        sameSite: true,
+        sameSite: 'none',
       }).send({ token });
     })
     .catch(() => {
