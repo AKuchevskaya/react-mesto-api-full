@@ -10,82 +10,82 @@ class Api {
 
   getProfile() {
     return fetch(`${this._baseUrl}/users/me`, {
-      credentials: 'include', // посылает токен в куки вместе с запросом.
       headers: this._headers, 
+      credentials: 'include', // посылает токен в куки вместе с запросом.
     }).then((res) => this._checkResponse(res));
   }
 
   editAvatar({ avatar }) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: "PATCH",
-      credentials: 'include',
       headers: this._headers,
       body: JSON.stringify({
         avatar,
       }),
+      credentials: 'include',
     }).then((res) => this._checkResponse(res));
   }
 
   editProfile(currentUser) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "PATCH",
-      credentials: 'include',
       headers: this._headers,
       body: JSON.stringify({
         name: currentUser.name,
         about: currentUser.about,
       }),
+      credentials: 'include',
     }).then((res) => this._checkResponse(res));
   }
 
   getInitialCards() {
     return fetch(`${this._baseUrl}/cards`, {
-      credentials: 'include',
       headers: this._headers,
+      credentials: 'include',
     }).then((res) => this._checkResponse(res));
   }
 
   addCard({ name, link }) {
     return fetch(`${this._baseUrl}/cards`, {
       method: "POST",
-      credentials: 'include',
       headers: this._headers,
       body: JSON.stringify({
         name,
         link,
       }),
+      credentials: 'include',
     }).then((res) => this._checkResponse(res));
   }
 
   deleteCard(id) {
     return fetch(`${this._baseUrl}/cards/${id}`, {
       method: "DELETE",
-      credentials: 'include',
       headers: this._headers,
+      credentials: 'include',
     }).then((res) => this._checkResponse(res));
   }
 
   deleteLike(id) {
     return fetch(`${this._baseUrl}/cards/${id}/likes`, {
       method: "DELETE",
-      credentials: 'include',
       headers: this._headers,
+      credentials: 'include',
     }).then((res) => this._checkResponse(res));
   }
 
   addLike(id) {
     return fetch(`${this._baseUrl}/cards/${id}/likes`, {
       method: "PUT",
-      credentials: 'include',
       headers: this._headers,
+      credentials: 'include',
     }).then((res) => this._checkResponse(res));
   }
 
   changeLikeCardStatus(id, isLiked) {
     return fetch(`${this._baseUrl}/cards/${id}/likes`, {
       method: isLiked ? "PUT" : "DELETE",
-      credentials: 'include',
       headers: this._headers,
+      credentials: 'include',
     }).then((res) => this._checkResponse(res));
   }
 }

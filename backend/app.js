@@ -7,13 +7,12 @@ const cookieParser = require('cookie-parser');
 const { Joi, celebrate, errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
-const cors = require('./middlewares/cors');
-const { requestLogger, errorLogger } = require('./middlewares/logger'); 
 const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards');
+const cors = require('./middlewares/cors');
+const { requestLogger, errorLogger } = require('./middlewares/logger'); 
 
 const { PORT = 3000 } = process.env;
-//const { PORT = 3001 } = process.env;
 
 const app = express();
 const {
@@ -23,10 +22,11 @@ const NotFoundError = require('./errors/NotFoundError'); // 404
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
+app.use(cors); // подключаем cors
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(cors); // подключаем cors
+app.use(cookieParser());
 
 app.use(requestLogger); // подключаем логгер запросов
 
@@ -47,7 +47,6 @@ app.post('/signin', celebrate({
   }).unknown(true),
 }), login);
 
-app.use(cookieParser());
 app.use(auth);
 
 app.use('/users', routerUser);

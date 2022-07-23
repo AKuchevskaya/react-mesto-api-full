@@ -11,11 +11,11 @@ export const register = (email, password) => {
       "Accept": "application/json",
       "Content-Type": "application/json",
     },
-    credentials: 'include',
     body: JSON.stringify({
       email,
       password,
     }),
+    credentials: 'include',
   }).then(checkResponse);
 };
 
@@ -26,23 +26,11 @@ export const authorize = (email, password) => {
       "Accept": "application/json",
       "Content-Type": "application/json",
     },
-    credentials: 'include',
     body: JSON.stringify({
       email,
       password,
     }),
-  }).then(checkResponse);
-};
-
-export const getContent = () => {
-  return fetch(`${BASE_URL}/users/me`, {
-    method: "GET",
-    headers: {
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-      // Authorization: `Bearer ${token}`,
-    },
-    credentials: 'include'
+    credentials: 'include',
   }).then(checkResponse);
 };
 
@@ -57,3 +45,16 @@ export const signOut = () => {
   })
   .then(checkResponse);
 };
+
+export const getContent = () => {
+  return fetch(`${BASE_URL}/users/me`, {
+    method: "GET",
+    headers: {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      // Authorization: `Bearer ${token}`,
+    },
+    credentials: 'include'
+  }).then(checkResponse);
+};
+
