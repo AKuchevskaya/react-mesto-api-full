@@ -42,13 +42,22 @@ function App() {
 
   function tokenCheck() {
     if (localStorage.getItem("jwt")) {
+    //if (localStorage.getItem("email")) {
       let token = localStorage.getItem("jwt");
       Auth.getContent(token)
+      //Auth.getContent()
         .then((res) => {
-          const { _id, email } = res.email;
+          //const { _id, email } = res.data;
+          //const { email } = res.data;
           setLoggedIn(true);
-          setUserData({ ...userData, _id, email });
+          
+          //setUserData({ _id, email });
+          setUserData(res.email);
+          // setUserData({ ...userData, _id, email });
         })
+        .then((res) => {
+					history.push('/');
+				})
         .catch((err) => {
           console.log(`Ошибка проверки токена...: ${err}`);
         });
@@ -58,11 +67,11 @@ function App() {
   useEffect(() => {
     tokenCheck();
   }, []);
-  useEffect(() => {
-    if (loggedIn) {
-      history.push("/");
-    }
-  }, [loggedIn]);
+  // useEffect(() => {
+  //   if (loggedIn) {
+  //     history.push("/");
+  //   }
+  // }, [loggedIn]);
 
   useEffect(() => {
     if (loggedIn) {
@@ -78,19 +87,22 @@ function App() {
         .catch((err) => {
           console.log(`Ошибка получения данных пользователя.....: ${err}`);
         });
+        //history.push("/");
     }
   }, [loggedIn]);
 
   function handleCardLike(card) {
     // Снова проверяем, есть ли уже лайк на этой карточке
-    const isLiked = card.likes.some((user) => user._id === currentUser._id);
+    const isLiked = card.likes.some((u) => u === currentUser._id);
+    //const isLiked = card.likes.some((user) => user._id === currentUser._id);
 
     // Отправляем запрос в API и получаем обновлённые данные карточки
     api
       .changeLikeCardStatus(card._id, !isLiked)
       .then((newCard) => {
         setCards((state) =>
-          state.map((item) => (item._id === card._id ? newCard : item))
+        // state.map((item) => (item === card._id ? newCard : item))
+        state.map((item) => (item._id === card._id ? newCard : item))
         );
       })
       .catch((err) => {
@@ -98,7 +110,7 @@ function App() {
       });
   }
 
-  function handleCardDelete(card) {
+  function handleCardDelete() {
     api
       .deleteCard(removedCard._id)
       .then(() => {
@@ -127,13 +139,14 @@ function App() {
   }
 
   function handleCardClick(card) {
+    //заменить на просто setSelectedCard(card);
     setSelectedCard({
       isOpened: true,
       name: card.name,
       link: card.link,
     });
   }
-  function handleUpdateAvatar({ avatar }) {
+  function handleUpdateAvatar(avatar) {
     api
       .editAvatar(avatar)
       .then((res) => {
@@ -144,11 +157,12 @@ function App() {
         console.log(`Ошибка обновления аватара.....: ${err}`);
       });
   }
-  function handleUpdateUser({ name, about }) {
+  
+  function handleUpdateUser(currentUser) {
     api
-      .editProfile(name, about)
-      .then((res) => {
-        setCurrentUser(res);
+      .editProfile(currentUser)
+      .then((currentUser) => {
+        setCurrentUser(currentUser);
         closeAllPopups();
       })
       .catch((err) => {
@@ -156,9 +170,9 @@ function App() {
       });
   }
 
-  function handleAddPlaceSubmit({ name, link }) {
+  function handleAddPlaceSubmit(card) {
     api
-      .addCard(name, link)
+      .addCard(card)
       .then((newCard) => {
         setCards([newCard, ...cards]);
         closeAllPopups();
@@ -175,17 +189,26 @@ function App() {
     setSelectedCard({ ...selectedCard, isOpened: false });
     setTooltipOpen(false);
   }
-  function handleRegister({ email, password }) {
+  function handleRegister(email, password) {
     return Auth.register(email, password)
       .then((res) => {
-        const { email } = res.email;
-        setUserData({ ...userData, email });
-        setTooltipOpen(true);
-        setTooltip({
-          image: success,
-          message: "Вы успешно зарегистрировались!",
-        });
-        history.push("/signin");
+        //const { email } = res.email;
+        //const { email } = res;
+        //setUserData({ ...userData, email });
+        if (res) {
+          history.push("/signin");
+          setTooltipOpen(true);
+          setTooltip({
+            image: success,
+            message: "Вы успешно зарегистрировались!",
+          });
+        } else {
+          setTooltipOpen(true);
+          setTooltip({
+            image: success,
+            message: "Что-то пошло не так! Попробуйте ещё раз.",
+          });
+        }
       })
       .catch((err) => {
         console.log(`Ошибка регистрации...: ${err}`);
@@ -198,13 +221,21 @@ function App() {
       });
   }
 
-  function handleLogin({ email, password }) {
+  function handleLogin(email, password) {
     return Auth.authorize(email, password)
       .then((data) => {
         if (data.token) {
-          localStorage.setItem("jwt", data.token);
+          localStorage.setItem('jwt', data.token);
           tokenCheck();
+          setUserData(data.email);
+          setLoggedIn(true);
+          history.push('/');
         }
+          //setUserData({ email: data.email });
+          //setUserData({ _id: data._id, email: data.email });
+          //setLoggedIn(true);
+          //history.push('/');
+        
       })
       .catch((err) => {
         console.log(`Ошибка авторизации...: ${err}`);
@@ -216,10 +247,12 @@ function App() {
       });
   }
 
-  function signOut() {
+  function handleSignOut() {
+    //localStorage.removeItem("email");
+    Auth.signOut();
     localStorage.removeItem("jwt");
     setLoggedIn(false);
-    setUserData({ _id: "", email: "" });
+    setUserData({ email: "" });
     history.push("/signin");
   }
 
@@ -244,7 +277,7 @@ function App() {
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page__container">
-        <Header loggedIn={loggedIn} userData={userData} signOut={signOut} />
+        <Header loggedIn={loggedIn} userData={userData} handleSignOut={handleSignOut} />
         <Switch>
           <ProtectedRoute exact path="/" loggedIn={loggedIn}>
             <Main

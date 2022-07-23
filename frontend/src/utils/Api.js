@@ -10,12 +10,12 @@ class Api {
 
   getProfile() {
     return fetch(`${this._baseUrl}/users/me`, {
-      credentials: 'include',
-      headers: this._headers,
+      credentials: 'include', // посылает токен в куки вместе с запросом.
+      headers: this._headers, 
     }).then((res) => this._checkResponse(res));
   }
 
-  editAvatar(avatar) {
+  editAvatar({ avatar }) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: "PATCH",
       credentials: 'include',
@@ -26,14 +26,14 @@ class Api {
     }).then((res) => this._checkResponse(res));
   }
 
-  editProfile(name, about) {
+  editProfile(currentUser) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "PATCH",
       credentials: 'include',
       headers: this._headers,
       body: JSON.stringify({
-        name,
-        about,
+        name: currentUser.name,
+        about: currentUser.about,
       }),
     }).then((res) => this._checkResponse(res));
   }
@@ -45,7 +45,7 @@ class Api {
     }).then((res) => this._checkResponse(res));
   }
 
-  addCard(name, link) {
+  addCard({ name, link }) {
     return fetch(`${this._baseUrl}/cards`, {
       method: "POST",
       credentials: 'include',

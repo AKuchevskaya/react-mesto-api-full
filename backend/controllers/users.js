@@ -62,14 +62,10 @@ module.exports.createUser = (req, res, next) => {
     }))
 
     .then((user) => {
+      const createdUser = user.toObject();
+      delete createdUser.password; 
       res.status(SUCCESSFUL_STATUS_CODE)
-        .send({
-          _id: user._id,
-          name: user.name,
-          about: user.about,
-          avatar: user.avatar,
-          email: user.email,
-        });
+        .send({ data: createdUser });
     })
     .catch((err) => {
       if (err.name === 'MongoServerError') {
@@ -83,7 +79,7 @@ module.exports.createUser = (req, res, next) => {
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.send(users))
     .catch(next);
 };
 
@@ -91,7 +87,7 @@ module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
     .orFail(new NotFoundError('Передан несуществующий _id пользователя'))
     .then((user) => {
-      res.send({ data: user });
+      res.send(user);
     })
     .catch((err) => next(err));
 };
@@ -100,7 +96,8 @@ module.exports.findUser = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(new NotFoundError('Пользователь не найден'))
     .then((user) => {
-      res.send({ data: user });
+      res.send(user);
+      // res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -126,7 +123,7 @@ module.exports.updateUser = (req, res, next) => {
     .orFail(() => {
       next(new NotFoundError('Передан несуществующий _id пользователя'));
     })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new BadReqError('Переданы некорректные данные при обновлении профиля'));
@@ -150,7 +147,7 @@ module.exports.updateAvatar = (req, res, next) => {
     .orFail(() => {
       next(new NotFoundError('Передан несуществующий _id пользователя'));
     })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new BadReqError('Переданы некорректные данные при обновлении аватара профиля'));

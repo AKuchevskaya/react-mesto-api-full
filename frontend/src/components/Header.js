@@ -27,7 +27,7 @@ function Header(props) {
       <Route exact path="/">
         <div className="header__box">
           <p className="header__email">{email}</p>
-          <Link className="header__link" to="/signin" onClick={props.signOut}>
+          <Link className="header__link" to="/signin" onClick={props.handleSignOut}>
             Выйти
           </Link>
         </div>
