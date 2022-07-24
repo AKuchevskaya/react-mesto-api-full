@@ -48,8 +48,8 @@ function App() {
           if (res) {
             console.log('email 1', res.email);
             setLoggedIn(true);
-            const { email } = res.email;
-            setUserData({ ...userData, email });
+            //const { email } = res.email;
+            //setUserData({ ...userData, email });
           }
         })
         .then((res) => {
@@ -63,7 +63,7 @@ function App() {
 
   useEffect(() => {
     tokenCheck();
-  }, [loggedIn]);
+  }, []);
 
   // useEffect(() => {
   //   history.push("/");
