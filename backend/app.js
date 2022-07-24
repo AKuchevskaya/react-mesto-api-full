@@ -1,6 +1,5 @@
 require('dotenv').config();
 
-console.log(process.env.NODE_ENV); // production
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -12,30 +11,33 @@ const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards');
 const cors = require('./middlewares/cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const {
+  SERVER_ERROR_CODE,
+} = require('./constants/errors');
+
+const NotFoundError = require('./errors/NotFoundError'); // 404
 
 const { PORT = 3000 } = process.env;
 
 const app = express();
-const {
-  SERVER_ERROR_CODE,
-} = require('./constants/errors');
-const NotFoundError = require('./errors/NotFoundError'); // 404
+
+app.use(cookieParser());
+console.log(process.env.NODE_ENV); // production
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
-app.use(cors); // подключаем cors
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
+
+app.use(cors); // подключаем cors
+
+app.use(requestLogger); // подключаем логгер запросов
 
 app.get('/crash-test', () => { // краш-тест сервера
   setTimeout(() => {
     throw new Error('Сервер сейчас упадёт');
   }, 0);
 });
-
-app.use(requestLogger); // подключаем логгер запросов
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
