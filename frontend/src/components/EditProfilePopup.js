@@ -12,14 +12,8 @@ function EditProfilePopup({
 }) {
   const currentUser = useContext(CurrentUserContext);
   const [name, setName] = useState("");
-  const [isNameValid, setNameValidity] = useState(false);
-  const [nameError, setNameError] = useState("");
 
   const [description, setDescription] = useState("");
-  const [isDescriptionValid, setDescriptionValidity] = useState(false);
-  const [descriptionError, setDescriptionError] = useState("");
-
-  const [isFormValid, setValidityForm] = useState(false);
 
   // После загрузки текущего пользователя из API
   // его данные будут использованы в управляемых компонентах.
