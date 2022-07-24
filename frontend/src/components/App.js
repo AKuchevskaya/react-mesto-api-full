@@ -30,6 +30,7 @@ function App() {
   const [removedCard, setRemovedCard] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [userData, setUserData] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const history = useHistory();
   const [isTooltipOpen, setTooltipOpen] = useState(false);
   const [tooltip, setTooltip] = useState({
@@ -50,7 +51,7 @@ function App() {
           
           setLoggedIn(true);
           // проверить место, приходит ли майл
-          setCurrentUser(res.email);
+          setUserEmail(res.email);
         })
         .then((res) => {
           history.push('/');
@@ -221,6 +222,7 @@ function handleLogin({ email, password }) {
 
       if (data.token) {
         localStorage.setItem('jwt', data.token);
+        setUserEmail(email);
         tokenCheck();
         setLoggedIn(true);
         history.push('/');
@@ -241,7 +243,7 @@ function handleLogin({ email, password }) {
 function signOut() {
   localStorage.removeItem("jwt");
   setLoggedIn(false);
-  setUserData({ email: "" });
+  setUserEmail("");
   history.push("/signin");
 }
 
@@ -266,7 +268,7 @@ useEffect(() => {
 return (
   <CurrentUserContext.Provider value={currentUser}>
     <div className="page__container">
-      <Header loggedIn={loggedIn} userData={userData} signOut={signOut} />
+      <Header loggedIn={loggedIn} email={userEmail} signOut={signOut} />
       <Switch>
         <ProtectedRoute exact path="/" loggedIn={loggedIn}>
           <Main

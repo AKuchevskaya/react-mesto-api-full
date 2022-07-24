@@ -3,7 +3,7 @@ import { Link, Route } from "react-router-dom";
 import logo from "../../src/images/logo.svg";
 
 function Header(props) {
-   let { email } = props.userData.email || {};
+   let { email } = props.email || {};
   return (
     <header className="header">
       <Route>
@@ -26,7 +26,7 @@ function Header(props) {
 
       <Route exact path="/">
         <div className="header__box">
-          <p className="header__email">{ props.loggedIn ? email : '' }</p>
+          <p className="header__email">{email}</p>
           <Link className="header__link" to="/signin" onClick={props.signOut}>
             Выйти
           </Link>
