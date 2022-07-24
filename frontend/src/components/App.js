@@ -42,10 +42,18 @@ function App() {
 
   function tokenCheck() {
     if (localStorage.getItem("jwt")) {
-      let token = localStorage.getItem("jwt");
+      const token = localStorage.getItem("jwt");
       return Auth.getContent(token)
+      //getContent(token)
         .then((res) => {
+          console.log('что здесь????', res);
+          
           setLoggedIn(true);
+          // проверить место, приходит ли майл
+          setCurrentUser(res.email);
+        })
+        .then((res) => {
+          history.push('/');
         })
         .catch((err) => {
           console.log(`Ошибка проверки токена...: ${err}`);
@@ -55,15 +63,16 @@ function App() {
 
   useEffect(() => {
     tokenCheck();
-  }, []);
-  useEffect(() => {
-    if (loggedIn) {
-      history.push("/");
-    }
   }, [loggedIn]);
 
+  // useEffect(() => {
+  //   if (loggedIn) {
+  //     history.push("/");
+  //   }
+  // }, [loggedIn]);
+
   useEffect(() => {
-    if (loggedIn) {
+   // if (loggedIn) {
       Promise.all([
         //в Promise.all передаем массив промисов которые нужно выполнить
         api.getInitialCards(),
@@ -76,7 +85,7 @@ function App() {
         .catch((err) => {
           console.log(`Ошибка получения данных пользователя.....: ${err}`);
         });
-    }
+   // }
   }, [loggedIn]);
 
   function handleCardLike(card) {
@@ -177,8 +186,8 @@ function App() {
   function handleRegister({ email, password }) {
     return Auth.register(email, password)
       .then((res) => {
-        const { email } = res.data;
-        setUserData({ ...userData, email });
+        //const { email } = res.data;
+        //setUserData({ ...userData, email });
         if (res) {
           history.push("/signin");
           setTooltipOpen(true);
@@ -207,6 +216,7 @@ function App() {
 
 function handleLogin({ email, password }) {
   return Auth.authorize(email, password)
+  //return authorize(email, password)
     .then((data) => {
 
       if (data.token) {
@@ -215,7 +225,7 @@ function handleLogin({ email, password }) {
         setLoggedIn(true);
         history.push('/');
       } else {
-        setLoggedIn(false);
+        history.push('/signup');
       }
     })
     .catch((err) => {
@@ -268,16 +278,15 @@ return (
             onCardLike={handleCardLike}
             onCardButtonDeleteClick={handleButtonDeleteClick}
           />
-          <Footer />
         </ProtectedRoute>
 
         <Route path="/signup">
           <Register handleRegister={handleRegister} />
         </Route>
         <Route path="/signin">
-          <Login handleLogin={handleLogin} tokenCheck={tokenCheck} />
-        </Route>
-        <Route>
+          <Login handleLogin={handleLogin} />
+        </Route >
+        <Route path = "*" >
           {loggedIn ? <Redirect to="/" /> : <Redirect to="/signin" />}
         </Route>
       </Switch>
@@ -321,6 +330,7 @@ return (
       />
 
       <ImagePopup selectedCard={selectedCard} onClose={closeAllPopups} />
+      <Footer />
     </div>
   </CurrentUserContext.Provider>
 );
