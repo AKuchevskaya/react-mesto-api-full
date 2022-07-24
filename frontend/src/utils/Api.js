@@ -26,13 +26,13 @@ class Api {
     }).then((res) => this._checkResponse(res));
   }
 
-  editProfile(currentUser) {
+  editProfile(userData) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "PATCH",
       headers: this._headers,
       body: JSON.stringify({
-        name: currentUser.name,
-        about: currentUser.about,
+        name: userData.name,
+        about: userData.about,
       }),
       credentials: 'include',
     }).then((res) => this._checkResponse(res));
