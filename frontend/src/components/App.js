@@ -45,10 +45,15 @@ function App() {
       let token = localStorage.getItem("jwt");
       return Auth.getContent(token)
         .then((res) => {
-          console.log('email 1', res.email);
-          setLoggedIn(true);
-          const { email } = res.email;
-          setUserData({ ...userData, email });
+          if (res) {
+            console.log('email 1', res.email);
+            setLoggedIn(true);
+            const { email } = res.email;
+            setUserData({ ...userData, email });
+          }
+        })
+        .then((res) => {
+          history.push('/');
         })
         .catch((err) => {
           console.log(`Ошибка проверки токена...: ${err}`);
@@ -58,46 +63,42 @@ function App() {
 
   useEffect(() => {
     tokenCheck();
-  }, []);
-
-  useEffect(() => {
-    if (loggedIn) {
-      history.push("/");
-    }
   }, [loggedIn]);
 
-  useEffect(() => {
-    if (loggedIn) {
-      Promise.all([
-        //в Promise.all передаем массив промисов которые нужно выполнить
-        api.getInitialCards(),
-        api.getProfile(),
-      ])
-        .then(([cards, userData]) => {
-          setCards(cards);
-          setCurrentUser(userData);
-        })
-        .catch((err) => {
-          console.log(`Ошибка получения данных пользователя.....: ${err}`);
-        });
-    }
-  }, [loggedIn]);
+  // useEffect(() => {
+  //   history.push("/");
+  // }, [loggedIn]);
+
+useEffect(() => {
+  Promise.all([
+    //в Promise.all передаем массив промисов которые нужно выполнить
+    api.getInitialCards(),
+    api.getProfile(),
+  ])
+    .then(([cards, userData]) => {
+      setCards(cards);
+      setCurrentUser(userData);
+    })
+    .catch((err) => {
+    console.log(`Ошибка получения данных пользователя.....: ${err}`);
+    });
+}, [loggedIn]);
 
 // регистрация, авторизация, выход
 
 function handleRegister({ email, password }) {
   return Auth.register(email, password)
     .then((res) => {
-      console.log('email 2', res.data);
-      
-      const { email } = res.data;
-      setUserData({ ...userData, email });
       if (res) {
-        history.push("/signin");
+        console.log('email 2', res.data);
+        const { email } = res.data;
+
+        setUserData({ ...userData, email });
         setTooltip({
           image: success,
           message: "Вы успешно зарегистрировались!",
         });
+        history.push("/signin");
       } else {
         setTooltipOpen(true);
         setTooltip({
@@ -119,14 +120,12 @@ function handleRegister({ email, password }) {
 function handleLogin({ email, password }) {
   return Auth.authorize(email, password)
     .then((data) => {
-
       if (data.token) {
         localStorage.setItem('jwt', data.token);
-        
+        tokenCheck();
         setLoggedIn(true);
-        tokenCheck();
+        history.push('/');
       }
-        tokenCheck();
     })
     .catch((err) => {
       console.log(`Ошибка авторизации...: ${err}`);
