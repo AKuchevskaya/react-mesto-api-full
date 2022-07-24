@@ -3,7 +3,7 @@ import { Link, Route } from "react-router-dom";
 import logo from "../../src/images/logo.svg";
 
 function Header(props) {
-  let { email } = props.email || {};
+   let { email } = props.userData || {};
   return (
     <header className="header">
       <Route>

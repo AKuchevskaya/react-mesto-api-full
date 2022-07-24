@@ -29,7 +29,7 @@ function App() {
   const [selectedCard, setSelectedCard] = useState({});
   const [removedCard, setRemovedCard] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [email, setEmail] = useState('');
+  const [userData, setUserData] = useState('');
   const history = useHistory();
   const [isTooltipOpen, setTooltipOpen] = useState(false);
   const [tooltip, setTooltip] = useState({
@@ -42,22 +42,14 @@ function App() {
 
   function tokenCheck() {
     if (localStorage.getItem("jwt")) {
-    //if (localStorage.getItem("email")) {
       let token = localStorage.getItem("jwt");
-      Auth.getContent(token)
-      //Auth.getContent()
+      return Auth.getContent(token)
         .then((res) => {
-          //const { _id, email } = res.data;
-          //const { email } = res.data;
+          const { email } = res.email;
           setLoggedIn(true);
-          
-          //setUserData({ _id, email });
-          setEmail(res.email);
-          // setUserData({ ...userData, _id, email });
+          setUserData({ ...userData, email });
+          //console.log('почта?', res.email)
         })
-        .then((res) => {
-					history.push('/');
-				})
         .catch((err) => {
           console.log(`Ошибка проверки токена...: ${err}`);
         });
@@ -67,11 +59,11 @@ function App() {
   useEffect(() => {
     tokenCheck();
   }, []);
-  // useEffect(() => {
-  //   if (loggedIn) {
-  //     history.push("/");
-  //   }
-  // }, [loggedIn]);
+  useEffect(() => {
+    if (loggedIn) {
+      history.push("/");
+    }
+  }, [loggedIn]);
 
   useEffect(() => {
     if (loggedIn) {
@@ -87,24 +79,18 @@ function App() {
         .catch((err) => {
           console.log(`Ошибка получения данных пользователя.....: ${err}`);
         });
-        //history.push("/");
     }
   }, [loggedIn]);
 
   function handleCardLike(card) {
     // Снова проверяем, есть ли уже лайк на этой карточке
-    console.log('здесь лайк', card);
-    
-    const isLiked = card.likes.some((u) => u === currentUser._id);
-    //const isLiked = card.likes.some((user) => user._id === currentUser._id);
+    const isLiked = card.likes.some((i) => i === currentUser._id);
 
     // Отправляем запрос в API и получаем обновлённые данные карточки
     api
       .changeLikeCardStatus(card._id, !isLiked)
       .then((newCard) => {
-        console.log('как приходят данные о лайке', newCard);
         setCards((state) =>
-        // state.map((item) => (item === card._id ? newCard : item))
         state.map((item) => (item._id === card._id ? newCard : item))
         );
       })
@@ -142,7 +128,6 @@ function App() {
   }
 
   function handleCardClick(card) {
-    //заменить на просто setSelectedCard(card);
     setSelectedCard({
       isOpened: true,
       name: card.name,
@@ -195,9 +180,8 @@ function App() {
   function handleRegister({ email, password }) {
     return Auth.register(email, password)
       .then((res) => {
-        //const { email } = res.email;
-        //const { email } = res;
-        //setUserData({ ...userData, email });
+        const { email } = res.email;
+        setUserData({ ...userData, email });
         if (res) {
           history.push("/signin");
           setTooltipOpen(true);
@@ -226,23 +210,20 @@ function App() {
 
   function handleLogin({ email, password }) {
     return Auth.authorize(email, password)
-      .then((data) => {
-        if (data.token) {
-          console.log("как добавить почту в хедер", data);
-          localStorage.setItem('jwt', data.token);
+      .then((res) => {
+
+        if (res.token) {
+          localStorage.setItem('jwt', res.token);
           tokenCheck();
-          setEmail(data.email);
+          // setEmail(data.email);
           setLoggedIn(true);
           history.push('/');
+        } else {
+          setLoggedIn(false);
         }
-          //setUserData({ email: data.email });
-          //setUserData({ _id: data._id, email: data.email });
-          //setLoggedIn(true);
-          //history.push('/');
-        
       })
       .catch((err) => {
-        //console.log(`Ошибка авторизации...: ${err}`);
+        console.log(`Ошибка авторизации...: ${err}`);
         setTooltipOpen(true);
         setTooltip({
           image: error,
@@ -252,10 +233,9 @@ function App() {
   }
 
   function signOut() {
-    //localStorage.removeItem("email");
     localStorage.removeItem("jwt");
     setLoggedIn(false);
-    setEmail("");
+    setUserData({ email: "" });
     history.push("/signin");
   }
 
@@ -280,7 +260,7 @@ function App() {
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page__container">
-        <Header loggedIn={loggedIn} email={email} signOut={signOut} />
+        <Header loggedIn={loggedIn} userData={userData} signOut={signOut} />
         <Switch>
           <ProtectedRoute exact path="/" loggedIn={loggedIn}>
             <Main
