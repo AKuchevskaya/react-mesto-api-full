@@ -45,10 +45,14 @@ function App() {
       let token = localStorage.getItem("jwt");
       return Auth.getContent(token)
         .then((res) => {
-          const { email } = res.email;
-          setLoggedIn(true);
-          setUserData({ ...userData, email });
           //console.log('почта?', res.email)
+
+          //const { email } = res.email;
+          setLoggedIn(true);
+          //setUserData({ ...userData, email });
+          //console.log('почта3?', email)
+          
+
         })
         .catch((err) => {
           console.log(`Ошибка проверки токена...: ${err}`);
@@ -59,11 +63,11 @@ function App() {
   useEffect(() => {
     tokenCheck();
   }, []);
-  useEffect(() => {
-    if (loggedIn) {
-      history.push("/");
-    }
-  }, [loggedIn]);
+  // useEffect(() => {
+  //   if (loggedIn) {
+  //     history.push("/");
+  //   }
+  // }, [loggedIn]);
 
   useEffect(() => {
     if (loggedIn) {
@@ -180,7 +184,10 @@ function App() {
   function handleRegister({ email, password }) {
     return Auth.register(email, password)
       .then((res) => {
-        const { email } = res.email;
+        console.log('что приходит при регистрации', res);
+        console.log('что приходит при регистрации1', res.data);
+
+        const { email } = res.data;
         setUserData({ ...userData, email });
         if (res) {
           history.push("/signin");
@@ -210,10 +217,10 @@ function App() {
 
   function handleLogin({ email, password }) {
     return Auth.authorize(email, password)
-      .then((res) => {
+      .then((data) => {
 
-        if (res.token) {
-          localStorage.setItem('jwt', res.token);
+        if (data.token) {
+          localStorage.setItem('jwt', data.token);
           tokenCheck();
           // setEmail(data.email);
           setLoggedIn(true);
