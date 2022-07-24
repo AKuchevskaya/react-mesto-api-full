@@ -56,11 +56,11 @@ function App() {
   useEffect(() => {
     tokenCheck();
   }, []);
-  // useEffect(() => {
-  //   if (loggedIn) {
-  //     history.push("/");
-  //   }
-  // }, [loggedIn]);
+  useEffect(() => {
+    if (loggedIn) {
+      history.push("/");
+    }
+  }, [loggedIn]);
 
   useEffect(() => {
     if (loggedIn) {

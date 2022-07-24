@@ -61,11 +61,11 @@ app.use(auth);
 app.use('/users', routerUser);
 app.use('/cards', routerCard);
 
-app.use(errorLogger);
-
 app.use((req, res, next) => {
   next(new NotFoundError('Страница не существует'));
 });
+
+app.use(errorLogger);
 
 app.use(errors({ message: 'Проверьте корректность введенных данных' }));
 
