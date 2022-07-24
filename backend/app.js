@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+console.log(process.env.NODE_ENV); // production
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -10,35 +11,28 @@ const auth = require('./middlewares/auth');
 const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards');
 const cors = require('./middlewares/cors');
+
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+
+const { PORT = 3000 } = process.env;
+const app = express();
 const {
   SERVER_ERROR_CODE,
 } = require('./constants/errors');
 
 const NotFoundError = require('./errors/NotFoundError'); // 404
 
-const { PORT = 3000 } = process.env;
-
-const app = express();
-
-app.use(cookieParser());
-console.log(process.env.NODE_ENV); // production
-
 mongoose.connect('mongodb://localhost:27017/mestodb');
-
+app.use(cors); // подключаем cors
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(cors); // подключаем cors
-
-app.use(requestLogger); // подключаем логгер запросов
-
+app.use(cookieParser());
 app.get('/crash-test', () => { // краш-тест сервера
   setTimeout(() => {
     throw new Error('Сервер сейчас упадёт');
   }, 0);
 });
-
+app.use(requestLogger); // подключаем логгер запросов
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
@@ -48,24 +42,19 @@ app.post('/signup', celebrate({
     password: Joi.string().required().min(4),
   }),
 }), createUser);
-
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(4),
   }),
 }), login);
-
 app.use(auth);
-
 app.use('/users', routerUser);
 app.use('/cards', routerCard);
-
+app.use(errorLogger);
 app.use((req, res, next) => {
   next(new NotFoundError('Страница не существует'));
 });
-
-app.use(errorLogger);
 
 app.use(errors({ message: 'Проверьте корректность введенных данных' }));
 
