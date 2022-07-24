@@ -14,7 +14,7 @@ const ConflictError = require('../errors/ConflictError'); // 409
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  return User.findUserByCredentials(email, password)
+  User.findUserByCredentials(email, password)
     .then((user) => {
       // аутентификация успешна! пользователь в переменной user
       // создадим токен
@@ -24,11 +24,7 @@ module.exports.login = (req, res, next) => {
         // 'very-secret-key',
         { expiresIn: '7d' }, // токен будет просрочен через 7 дней после создания
       );
-
-      // вернём токен
-      // res.send({ token });
-
-      return res.cookie('jwt', token, {
+      res.cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
         secure: true,

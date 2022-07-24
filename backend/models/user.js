@@ -51,17 +51,12 @@ userSchema.statics.findUserByCredentials = function findUserByCredentials(email,
     .then((user) => {
       if (!user) {
         return Promise.reject(new UnauthorizedError('Неправильные почта или пароль'));
-        // const err = new UnauthorizedError('Неправильные почта или пароль');
-        // throw err;
       }
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
             return Promise.reject(new UnauthorizedError('Неправильные почта или пароль'));
-
-            // const err = new UnauthorizedError('Неправильные почта или пароль');
-            // throw err;
           }
           return user; // теперь user доступен
         });
