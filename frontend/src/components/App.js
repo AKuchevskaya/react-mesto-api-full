@@ -36,16 +36,19 @@ function App() {
     image: success,
     message: "Вы успешно зарегистрировались!",
   });
-
   const [errorMessage, setErrorMessage] = useState({});
   const [buttonState, setButtonState] = useState(true);
-
+  
+  // проверяем токен, если есть, стартовая страница - профиль, если нет - регистрация
   function tokenCheck() {
     if (localStorage.getItem("jwt")) {
       let token = localStorage.getItem("jwt");
       return Auth.getContent(token)
         .then((res) => {
+          console.log('email 1', res.email);
           setLoggedIn(true);
+          const { email } = res.email;
+          setUserData({ ...userData, email });
         })
         .catch((err) => {
           console.log(`Ошибка проверки токена...: ${err}`);
@@ -56,6 +59,7 @@ function App() {
   useEffect(() => {
     tokenCheck();
   }, []);
+
   useEffect(() => {
     if (loggedIn) {
       history.push("/");
@@ -78,6 +82,90 @@ function App() {
         });
     }
   }, [loggedIn]);
+
+// регистрация, авторизация, выход
+
+function handleRegister({ email, password }) {
+  return Auth.register(email, password)
+    .then((res) => {
+      console.log('email 2', res.data);
+      
+      const { email } = res.data;
+      setUserData({ ...userData, email });
+      if (res) {
+        history.push("/signin");
+        setTooltip({
+          image: success,
+          message: "Вы успешно зарегистрировались!",
+        });
+      } else {
+        setTooltipOpen(true);
+        setTooltip({
+          image: success,
+          message: "Что-то пошло не так! Попробуйте ещё раз.",
+        });
+      }
+    })
+    .catch((err) => {
+      console.log(`Ошибка регистрации...: ${err}`);
+      setTooltipOpen(true);
+      setTooltip({
+        image: error,
+        message: "Что-то пошло не так! Попробуйте ещё раз.",
+      });
+    });
+}
+
+function handleLogin({ email, password }) {
+  return Auth.authorize(email, password)
+    .then((data) => {
+
+      if (data.token) {
+        localStorage.setItem('jwt', data.token);
+        
+        setLoggedIn(true);
+        tokenCheck();
+      }
+        tokenCheck();
+    })
+    .catch((err) => {
+      console.log(`Ошибка авторизации...: ${err}`);
+      setTooltipOpen(true);
+      setTooltip({
+        image: error,
+        message: "Что-то пошло не так! Попробуйте ещё раз.",
+      });
+    });
+}
+
+function signOut() {
+  localStorage.removeItem("jwt");
+  setLoggedIn(false);
+  setUserData({ email: "" });
+  history.push("/signin");
+}
+
+  // карточки
+
+  function handleAddPlaceClick() {
+    setAddPlacePopupOpen(true);
+  }
+  function handleButtonDeleteClick(card) {
+    setQwestionPopupOpen(true);
+    setRemovedCard(card);
+  }
+
+  function handleAddPlaceSubmit(card) {
+    api
+      .addCard(card)
+      .then((newCard) => {
+        setCards([newCard, ...cards]);
+        closeAllPopups();
+      })
+      .catch((err) => {
+        console.log(`Ошибка добавления новой карточки.....: ${err}`);
+      });
+  }
 
   function handleCardLike(card) {
     // Снова проверяем, есть ли уже лайк на этой карточке
@@ -110,20 +198,6 @@ function App() {
       });
   }
 
-  function handleEditAvatarClick() {
-    setEditAvatarPopupOpen(true);
-  }
-  function handleEditProfileClick() {
-    setEditProfilePopupOpen(true);
-  }
-  function handleAddPlaceClick() {
-    setAddPlacePopupOpen(true);
-  }
-  function handleButtonDeleteClick(card) {
-    setQwestionPopupOpen(true);
-    setRemovedCard(card);
-  }
-
   function handleCardClick(card) {
     setSelectedCard({
       isOpened: true,
@@ -131,6 +205,13 @@ function App() {
       link: card.link,
     });
   }
+
+  // аватар
+
+  function handleEditAvatarClick() {
+    setEditAvatarPopupOpen(true);
+  }
+  
   function handleUpdateAvatar(avatar) {
     api
       .editAvatar(avatar)
@@ -143,6 +224,12 @@ function App() {
       });
   }
   
+  // обновление профиля
+
+  function handleEditProfileClick() {
+    setEditProfilePopupOpen(true);
+  }
+
   function handleUpdateUser(userData) {
     api
       .editProfile(userData)
@@ -155,17 +242,10 @@ function App() {
       });
   }
 
-  function handleAddPlaceSubmit(card) {
-    api
-      .addCard(card)
-      .then((newCard) => {
-        setCards([newCard, ...cards]);
-        closeAllPopups();
-      })
-      .catch((err) => {
-        console.log(`Ошибка добавления новой карточки.....: ${err}`);
-      });
-  }
+  
+  
+  // касается всех всплывающих окон
+
   function closeAllPopups() {
     setEditAvatarPopupOpen(false);
     setEditProfilePopupOpen(false);
@@ -174,84 +254,28 @@ function App() {
     setSelectedCard({ ...selectedCard, isOpened: false });
     setTooltipOpen(false);
   }
-  function handleRegister({ email, password }) {
-    return Auth.register(email, password)
-      .then((res) => {
-        const { email } = res.data;
-        setUserData({ ...userData, email });
-        if (res) {
-          history.push("/signin");
-          setTooltipOpen(true);
-          setTooltip({
-            image: success,
-            message: "Вы успешно зарегистрировались!",
-          });
-        } else {
-          setTooltipOpen(true);
-          setTooltip({
-            image: success,
-            message: "Что-то пошло не так! Попробуйте ещё раз.",
-          });
-        }
-      })
-      .catch((err) => {
-        console.log(`Ошибка регистрации...: ${err}`);
-        setTooltipOpen(true);
 
-        setTooltip({
-          image: error,
-          message: "Что-то пошло не так! Попробуйте ещё раз.",
-        });
-      });
-  }
 
-  function handleLogin({ email, password }) {
-    return Auth.authorize(email, password)
-      .then((data) => {
 
-        if (data.token) {
-          localStorage.setItem('jwt', data.token);
-          tokenCheck();
-          setLoggedIn(true);
-          history.push('/');
-        } else {
-          setLoggedIn(false);
-        }
-      })
-      .catch((err) => {
-        console.log(`Ошибка авторизации...: ${err}`);
-        setTooltipOpen(true);
-        setTooltip({
-          image: error,
-          message: "Что-то пошло не так! Попробуйте ещё раз.",
-        });
-      });
-  }
+// валидация
 
-  function signOut() {
-    localStorage.removeItem("jwt");
-    setLoggedIn(false);
-    setUserData({ email: "" });
-    history.push("/signin");
-  }
-
-  function checkInputValidity(evt) {
-    if (!evt.currentTarget.checkValidity()) {
-      setErrorMessage({
-        ...errorMessage,
-        [evt.target.name]: evt.target.validationMessage,
-      });
-      setButtonState(true);
-    } else {
-      setErrorMessage({});
-      setButtonState(false);
-    }
-  }
-
-  useEffect(() => {
-    setErrorMessage({});
+function checkInputValidity(evt) {
+  if (!evt.currentTarget.checkValidity()) {
+    setErrorMessage({
+      ...errorMessage,
+      [evt.target.name]: evt.target.validationMessage,
+    });
     setButtonState(true);
-  }, [isEditProfilePopupOpen, isAddPlacePopupOpen, isEditAvatarPopupOpen]);
+  } else {
+    setErrorMessage({});
+    setButtonState(false);
+  }
+}
+
+useEffect(() => {
+  setErrorMessage({});
+  setButtonState(true);
+}, [isEditProfilePopupOpen, isAddPlacePopupOpen, isEditAvatarPopupOpen]);
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
