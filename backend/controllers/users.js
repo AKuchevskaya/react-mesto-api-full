@@ -9,7 +9,6 @@ const {
 } = require('../constants/errors');
 
 const BadReqError = require('../errors/BadReqError'); // 400
-const UnauthorizedError = require('../errors/UnauthorizedError'); // 401
 const NotFoundError = require('../errors/NotFoundError'); // 404
 const ConflictError = require('../errors/ConflictError'); // 409
 
@@ -36,10 +35,6 @@ module.exports.login = (req, res, next) => {
         sameSite: 'none',
       }).send({ token });
     })
-    .catch(() => {
-      // ошибка аутентификации
-      next(new UnauthorizedError('Требуется авторизация.'));
-    })
     .catch(next);
 };
 
@@ -49,10 +44,9 @@ module.exports.createUser = (req, res, next) => {
     about,
     avatar,
     email,
-    // eslint-disable-next-line no-unused-vars
     password,
   } = req.body;
-  bcrypt.hash(req.body.password, 10)
+  bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name,
       about,
@@ -63,7 +57,7 @@ module.exports.createUser = (req, res, next) => {
 
     .then((user) => {
       const createdUser = user.toObject();
-      delete createdUser.password; 
+      delete createdUser.password;
       res.status(SUCCESSFUL_STATUS_CODE)
         .send({ data: createdUser });
     })
@@ -73,8 +67,7 @@ module.exports.createUser = (req, res, next) => {
       } else {
         next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.getUsers = (req, res, next) => {
@@ -105,8 +98,7 @@ module.exports.findUser = (req, res, next) => {
       } else {
         next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.updateUser = (req, res, next) => {

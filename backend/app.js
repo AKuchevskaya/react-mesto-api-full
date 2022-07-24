@@ -1,4 +1,5 @@
-require('dotenv').config(); 
+require('dotenv').config();
+
 console.log(process.env.NODE_ENV); // production
 const express = require('express');
 const mongoose = require('mongoose');
@@ -10,7 +11,7 @@ const auth = require('./middlewares/auth');
 const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards');
 const cors = require('./middlewares/cors');
-const { requestLogger, errorLogger } = require('./middlewares/logger'); 
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3000 } = process.env;
 
@@ -43,14 +44,14 @@ app.post('/signup', celebrate({
     avatar: Joi.string().pattern(/http(s?):\/\/(www\.)?[0-9a-zA-Z-]+\.[a-zA-Z]+([0-9a-zA-Z-._~:?#[\]@!$&'()*+,;=]+)/),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(4),
-  }).unknown(true),
+  }),
 }), createUser);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(4),
-  }).unknown(true),
+  }),
 }), login);
 
 app.use(auth);
@@ -69,9 +70,10 @@ app.use(errors({ message: 'Проверьте корректность введ�
 app.use((err, req, res, next) => {
   if (err.statusCode === 500) {
     res.status(SERVER_ERROR_CODE).send({ message: 'Ошибка сервера по умолчанию' });
+  } else {
+    res.status(err.statusCode).send({ message: err.message });
+    next();
   }
-  res.status(err.statusCode).send({ message: err.message });
-  next();
 });
 
 app.listen(PORT, () => {
