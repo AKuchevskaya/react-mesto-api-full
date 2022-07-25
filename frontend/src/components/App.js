@@ -45,13 +45,11 @@ function App() {
     if (localStorage.getItem("jwt")) {
       const token = localStorage.getItem("jwt");
       return Auth.getContent(token)
-      //getContent(token)
         .then((res) => {
-          console.log('что здесь????', res);
-          
+          if (res) {
           setLoggedIn(true);
-          // проверить место, приходит ли майл
           setUserEmail(res.email);
+          }
         })
         .then((res) => {
           history.push('/');
@@ -66,14 +64,14 @@ function App() {
     tokenCheck();
   }, [loggedIn]);
 
-  // useEffect(() => {
-  //   if (loggedIn) {
-  //     history.push("/");
-  //   }
-  // }, [loggedIn]);
+  useEffect(() => {
+    if (loggedIn) {
+      history.push("/");
+    }
+  }, [loggedIn]);
 
   useEffect(() => {
-   // if (loggedIn) {
+    if (loggedIn) {
       Promise.all([
         //в Promise.all передаем массив промисов которые нужно выполнить
         api.getInitialCards(),
@@ -82,11 +80,12 @@ function App() {
         .then(([cards, userData]) => {
           setCards(cards);
           setCurrentUser(userData);
+          //console.log('content erftghjhgf?????', userData)
         })
         .catch((err) => {
           console.log(`Ошибка получения данных пользователя.....: ${err}`);
         });
-   // }
+    }
   }, [loggedIn]);
 
   function handleCardLike(card) {
@@ -187,9 +186,9 @@ function App() {
   function handleRegister({ email, password }) {
     return Auth.register(email, password)
       .then((res) => {
-        //const { email } = res.data;
-        //setUserData({ ...userData, email });
         if (res) {
+          const { email } = res.data;
+          setUserData({ ...userData, email });
           history.push("/signin");
           setTooltipOpen(true);
           setTooltip({
@@ -217,14 +216,12 @@ function App() {
 
 function handleLogin({ email, password }) {
   return Auth.authorize(email, password)
-  //return authorize(email, password)
     .then((data) => {
-
       if (data.token) {
         localStorage.setItem('jwt', data.token);
-        setUserEmail(email);
         tokenCheck();
         setLoggedIn(true);
+        setUserEmail(userData.email);
         history.push('/');
       } else {
         history.push('/signup');
@@ -243,7 +240,7 @@ function handleLogin({ email, password }) {
 function signOut() {
   localStorage.removeItem("jwt");
   setLoggedIn(false);
-  setUserEmail("");
+  setUserEmail({ email: "" })
   history.push("/signin");
 }
 
@@ -268,7 +265,7 @@ useEffect(() => {
 return (
   <CurrentUserContext.Provider value={currentUser}>
     <div className="page__container">
-      <Header loggedIn={loggedIn} email={userEmail} signOut={signOut} />
+      <Header loggedIn={loggedIn} userEmail={userEmail} signOut={signOut} />
       <Switch>
         <ProtectedRoute exact path="/" loggedIn={loggedIn}>
           <Main
