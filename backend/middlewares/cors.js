@@ -5,7 +5,6 @@ const allowedCors = [
   'https://api.mesto.kuchevskaya.nomoredomains.xyz',
 ];
 
-// eslint-disable-next-line consistent-return
 module.exports = ((req, res, next) => {
   const { origin } = req.headers;
   const { method } = req;
@@ -24,5 +23,5 @@ module.exports = ((req, res, next) => {
     // завершаем обработку запроса и возвращаем результат клиенту
     return res.end();
   }
-  next();
+  return next();
 });

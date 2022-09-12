@@ -29,7 +29,11 @@ module.exports.login = (req, res, next) => {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
-      }).send({ token });
+      }).send({
+        name: user.name,
+        email: user.email,
+        _id: user._id,
+      });
     })
     .catch(next);
 };
