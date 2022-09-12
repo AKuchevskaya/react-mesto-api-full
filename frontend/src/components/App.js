@@ -42,9 +42,9 @@ function App() {
   const [buttonState, setButtonState] = useState(true);
 
   function tokenCheck() {
-    if (localStorage.getItem("jwt")) {
-      const token = localStorage.getItem("jwt");
-      return Auth.getContent(token)
+    // if (localStorage.getItem("jwt")) {
+    //   const token = localStorage.getItem("jwt");
+      return Auth.getContent()
         .then((res) => {
           if (res) {
           setLoggedIn(true);
@@ -57,7 +57,7 @@ function App() {
         .catch((err) => {
           console.log(`Ошибка проверки токена...: ${err}`);
         });
-    }
+    // }
   }
 
   useEffect(() => {
